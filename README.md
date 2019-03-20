@@ -1,0 +1,1 @@
+Wasp3D add-in SDK demonstrates how users can create custom engine-addins to provide data to Wasp3D render engine.
