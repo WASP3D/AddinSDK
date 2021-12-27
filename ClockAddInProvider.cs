@@ -38,7 +38,7 @@ namespace Beesys.Wasp.AddIn
                         m_sAssemblyPath = sDirectoryName;
                 }
             }
-            catch (Exception)
+            catch(Exception ex)
             {
 
             }

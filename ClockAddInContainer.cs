@@ -45,6 +45,7 @@ namespace Beesys.Wasp.AddIn
             set
             {
                 m_ObjSceneGraph = value;
+                UpdateAddinSceneGraph(); //S.No.: -			10
             }
         }
 
@@ -76,6 +77,8 @@ namespace Beesys.Wasp.AddIn
             {
                 if (m_lstAddins != null && m_lstAddins.Contains(addin))
                 {
+                    if (addin is ClockAddIn)
+                        ((ClockAddIn)addin).OnBeforeShutDown();
                     addin.ShutDown();
                     m_lstAddins.Remove(addin);
                     addin = null;
@@ -244,7 +247,11 @@ namespace Beesys.Wasp.AddIn
                     foreach(IWAddIn addin in m_lstAddins) //S.No.: -			07
                     {
                         if (addin != null)
+                        {
+                            if (addin is ClockAddIn)
+                                ((ClockAddIn)addin).OnBeforeShutDown();
                             addin.ShutDown();
+                    }
                     }
                     // S.No.: -			02
                     m_lstAddins.Clear();
@@ -320,6 +327,26 @@ namespace Beesys.Wasp.AddIn
             finally
             {
 
+            }
+        }
+
+
+        private void UpdateAddinSceneGraph() //S.No.: -			10
+        {
+            try
+            {
+                if (m_lstAddins != null && m_lstAddins.Count > 0)
+                {
+                    foreach (IWAddIn objAddin in m_lstAddins)
+                    {
+                        
+                        (objAddin as ClockAddIn).SceneGraph = m_ObjSceneGraph;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                LogWriter.WriteLog(ex);
             }
         }
 

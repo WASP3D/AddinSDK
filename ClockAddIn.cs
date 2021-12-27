@@ -23,7 +23,6 @@ namespace Beesys.Wasp.AddIn
         private CPlayoutEngine                  m_ObjEngine                      = null;
         private string                          m_sFormat                        = "HH:mm:ss";
         private IWService                       m_objWService                    = null;
-        private Scene                           m_objSceneGraph                  = null;
         private string                          m_sAddinType                     = "Clock";
         private string                          m_sTodaysFormat                  = "HH:mm:ss";
         private string                          m_sTomorrowFormat                = "HH:mm:ss";
@@ -32,12 +31,20 @@ namespace Beesys.Wasp.AddIn
         TimeFormat                              m_objTimeFormat                  = null;// S.No.: -06
         WaspCulture m_objWaspCulture = null;// S.No.: -06
 
+        private object _lock; //S.No.: -			12
+        private bool _shutdownCalled;
+        private bool _renderCalled;
+
         #endregion
 
         #region Constructor
 
         public ClockAddIn()
         {
+            TableBehaviour = DataTableBehaviour.None; //S.No.: -11
+            _lock = new object();
+            _shutdownCalled = false;
+            _renderCalled = false;
         }
 
         #endregion
@@ -113,6 +120,7 @@ namespace Beesys.Wasp.AddIn
                 m_objWService = value;
             }
         }
+
         //end (Service)
         #endregion
 
@@ -157,12 +165,17 @@ namespace Beesys.Wasp.AddIn
                     if (m_FrmBaseEngineAddin == null)// S.No.: -06
                     {
                         m_FrmBaseEngineAddin = new FrmBaseEngineAddin();
+                        
+                        
                         if (!(this.Provider as ClockAddInProvider).CultureReader.FileExist)
                             m_FrmBaseEngineAddin.Text = "Time Format";
+                        
                         m_FrmBaseEngineAddin.Internationalization(m_objWaspCulture, (this.Provider as ClockAddInProvider).CultureReader.GetResourceValue("CaptionTimeFormat"));
                         m_FrmBaseEngineAddin.AddControl(m_objTimeFormat);
+                        m_objTimeFormat.BringToFront();
                     }
                     m_objTimeFormat.Format = Config;
+                    //m_FrmBaseEngineAddin.SetAppearenceColor(Service);
                     objdialogrslt = m_FrmBaseEngineAddin.ShowDialog();
                    
                     if (objdialogrslt == DialogResult.OK)// S.No.: -06
@@ -198,27 +211,14 @@ namespace Beesys.Wasp.AddIn
 
             }
         }
-        /// <summary>
-        /// On addin shutdown
-        /// </summary>
+
+
+
         protected override void OnShutDown()
-        {
-            CleanUp(); //S.No.: -			07
-        }
-
-
-
-        public void CleanUp() //S.No.: -			07
         {
             try
             {
-                if (m_objSceneGraph != null)
-                    m_objSceneGraph = null;
-                if (m_ObjEngine != null)
-                {
-                    m_ObjEngine.m_evtEWEnginRenderInfo -= new dlgtOnEngineRenderInfo(m_ObjEngine_m_evtEWEnginPreRenderInfo);
                     m_ObjEngine = null;
-                }
 
                 if (m_dtClock != null)
                     m_dtClock.Dispose(); //S.No.: -			07
@@ -235,6 +235,33 @@ namespace Beesys.Wasp.AddIn
             }
             catch (Exception ex)
             {
+                Beesys.Wasp.Workflow.LogWriter.WriteLog(ex);
+            }
+        }
+
+
+        public void CleanUp() //S.No.: -			07
+        {
+            try
+            {
+
+                _shutdownCalled = true; //S.No.: -			12
+                if (m_ObjEngine != null)
+                {
+                    m_ObjEngine.m_evtEWEnginRenderInfo -= new dlgtOnEngineRenderInfo(m_ObjEngine_m_evtEWEnginPreRenderInfo);
+                    
+                }
+
+                while (_renderCalled) //S.No.: -			12
+                {
+                    Thread.Sleep(2);
+                }
+
+
+                
+            }
+            catch (Exception ex)
+            {
                 Beesys.Wasp.Workflow.LogWriter.WriteLog(ClockAddinConstants.MODULENAME, ex);
             }
         }
@@ -248,9 +275,6 @@ namespace Beesys.Wasp.AddIn
                 SetValue(Config);
 
                 InitWireData();
-                if (SceneGraph != null)
-                    SetSGWrapper(SceneGraph);
-
                 m_ObjEngine = Engine;
 
                 if (m_ObjEngine.DesignerMode == 0) //S.No.: -			09
@@ -278,6 +302,19 @@ namespace Beesys.Wasp.AddIn
                 if (!string.IsNullOrEmpty(sType))
                     m_sAddinType = sType;
         }
+
+        /// <summary>
+        /// On addin shutdown
+        /// </summary>
+        public void OnBeforeShutDown()
+        {
+            lock (_lock)
+            {
+                CleanUp();
+            }
+            
+        }
+
 
         #endregion
 
@@ -356,6 +393,8 @@ namespace Beesys.Wasp.AddIn
 
                 if (fDegreeHour > 359)
                     fDegreeHour = 0;
+                if (m_dtClock.Rows.Count > 0)
+                {
                 datarow = m_dtClock.Rows[0];
                 datarow[ClockAddinConstants.TIME] = sTime;
                 datarow[ClockAddinConstants.HOUR] = fDegreeHour;
@@ -368,14 +407,18 @@ namespace Beesys.Wasp.AddIn
 
                 // S.No.: -			05
                 // Don't Update the value of Variables on every frame in designer mode as it hangs the designer
-                if (updatevariable)
+                    if (updatevariable && !_shutdownCalled)
                 {
+                        //Debug.WriteLine("@#$", "calling update");
                     UpdateVariable(ClockAddinConstants.VARTODAYDATE, dtNow.ToFileTime().ToString());
                     UpdateVariable(ClockAddinConstants.VARTOMORROWDATE, dtNow.AddDays(1).ToFileTime().ToString());
 
                     Today = new WDateTime(dtNow.ToFileTime());
                     Tomorrow = new WDateTime(dtNow.AddDays(1).ToFileTime());
+                        //Debug.WriteLine("@#$", "update call complete");
                 }
+            }
+                
             }
             finally
             {
@@ -384,14 +427,7 @@ namespace Beesys.Wasp.AddIn
             }
         }//end (UpdateTime)
 
-        /// <summary>
-        /// Set SceneGraph object
-        /// </summary>
-        /// <param name="objSG"></param>
-        private void SetSGWrapper(Scene objSG)
-        {   
-            m_objSceneGraph = objSG;
-        }
+        
 
         /// <summary>
         /// Sets the Last Selected Format
@@ -434,12 +470,31 @@ namespace Beesys.Wasp.AddIn
         {
             try
             {
+                
+                lock (_lock)
+                {
+                    try
+                    {
+                        if (!_shutdownCalled)
+                        {
+                            _renderCalled = true;
                 // S.No.: -			05
                 UpdateTime(true);
+            }
+                    }
+                    catch (Exception lex)
+                    {
+                        BeeSys.Wasp3D.Hosting.LogWriter.WriteLog(lex);
+                    }
+                }
             }
             catch (Exception ex)
             {
                 BeeSys.Wasp3D.Hosting.LogWriter.WriteLog(ex);
+            }
+            finally
+            {
+                _renderCalled = false;
             }
         }
 

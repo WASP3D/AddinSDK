@@ -14,12 +14,16 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Drawing.Drawing2D;
 using BeeSys.Wasp3D.Hosting;
+using System.Runtime.InteropServices;
 
 namespace Beesys.Wasp.AddIn
 {
+   
+
     public partial class TimeFormat : UCBaseEngineAddin
     {
-
+        [DllImport("uxtheme.dll", SetLastError = true, ExactSpelling = true, CharSet = CharSet.Unicode)]
+        public static extern int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
         #region Constants
 
         private DataTable m_dtClock;
@@ -94,7 +98,19 @@ namespace Beesys.Wasp.AddIn
         }
         #endregion
         #region Properties
-
+        //IWService _WService = null;
+        //public override IWService WService
+        //{
+        //    get
+        //    {
+        //        return _WService;
+        //    }
+        //    set
+        //    {
+        //        _WService = value;
+        //        SetAppearenceColor(_WService);
+        //    }
+        //}
         /// <summary>
         /// Sets the todays time format
         /// </summary>
@@ -142,6 +158,8 @@ namespace Beesys.Wasp.AddIn
             }
         }
 
+        
+
         #endregion
 
         #region Handled Events
@@ -155,7 +173,7 @@ namespace Beesys.Wasp.AddIn
                 m_sTomorrowFormat = txtbxTomorrowsFormat.Text;
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
 
             }
@@ -274,6 +292,7 @@ namespace Beesys.Wasp.AddIn
 
             try
             {
+                
                 m_dtHelp = new DataTable();
                 m_dtHelp.Columns.Add("Format");
                 m_dtHelp.Columns.Add("Description");
@@ -290,6 +309,7 @@ namespace Beesys.Wasp.AddIn
 
                     m_dtHelp.Rows.Add(dr);
                 }
+                SetAppearenceColor(obj);
             }
             catch(Exception ex)
             {
@@ -297,6 +317,96 @@ namespace Beesys.Wasp.AddIn
             }
             //dataGridView2.DataSource = m_dtHelp;
         }//end (InitHelp)
+       BeeSys.Wasp3D.Hosting.Appearance _objAppearance = null;
+        private void SetAppearenceColor(IWService m_IService)
+        {
+            try
+            {
+                _objAppearance = m_IService?.GetAppearance();
+                if (_objAppearance != null && 
+                    string.Compare(_objAppearance.Theme,"dark",StringComparison.OrdinalIgnoreCase)==0)
+                {
+                    this.panel1.SuspendLayout();
+                    this.panelBottom.SuspendLayout();
+                    this.tblpnlCntnr.SuspendLayout();
+                    this.SuspendLayout();
+                    SetWindowTheme(lstbxTomorrowsFormat.Handle, "DarkMode_Explorer", null);
+                    SetWindowTheme(lstbxTodaysFormats.Handle, "DarkMode_Explorer", null);
+                    dataGridView1.BackgroundColor = _objAppearance.BackColor;
+                    dataGridView1.ForeColor = _objAppearance.ForeColor;
+                    dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = _objAppearance.BackColor;
+                    dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = _objAppearance.ForeColor;
+                    dataGridView1.EnableHeadersVisualStyles = false;
+                    dataGridView1.DefaultCellStyle.BackColor = _objAppearance.BackColor;
+                    dataGridView1.DefaultCellStyle.ForeColor = _objAppearance.ForeColor;
+                    dataGridView1.DefaultCellStyle.SelectionBackColor = _objAppearance.BackColor;
+                    dataGridView1.DefaultCellStyle.SelectionForeColor = _objAppearance.ForeColor;
+                    dataGridView1.RowsDefaultCellStyle.BackColor= _objAppearance.BackColor;
+
+
+
+                    panel1.ForeColor = _objAppearance.ForeColor;
+                    panel1.BackColor = _objAppearance.BackColor;
+
+                    panelBottom.ForeColor = _objAppearance.ForeColor;
+                    panelBottom.BackColor = _objAppearance.BackColor;
+
+                    tblpnlCntnr.ForeColor = _objAppearance.ForeColor;
+                    tblpnlCntnr.BackColor = _objAppearance.BackColor;
+
+                    lstbxTodaysFormats.ForeColor = _objAppearance.ForeColor;
+                    lstbxTodaysFormats.BackColor = _objAppearance.BackColor;
+
+                    lblTimeFormat.ForeColor = _objAppearance.ForeColor;
+                    lblTimeFormat.BackColor = _objAppearance.BackColor;
+
+                    lstFormats.ForeColor = _objAppearance.ForeColor;
+                    lstFormats.BackColor = _objAppearance.BackColor;
+
+                    lstbxTomorrowsFormat.ForeColor = _objAppearance.ForeColor;
+                    lstbxTomorrowsFormat.BackColor = _objAppearance.BackColor;
+
+                    lblTodaysTimeFrmt.ForeColor = _objAppearance.ForeColor;
+                    lblTodaysTimeFrmt.BackColor = _objAppearance.BackColor;
+
+                    txtbxTodaysFormat.BackColor= _objAppearance.BackColor;
+                    txtbxTodaysFormat.ForeColor = _objAppearance.ForeColor;
+
+
+                    txtbxTomorrowsFormat.BackColor = _objAppearance.BackColor;
+                    txtbxTomorrowsFormat.ForeColor = _objAppearance.ForeColor;
+
+                    txtFormat.ForeColor = _objAppearance.ForeColor;
+                    txtFormat.BackColor = _objAppearance.BackColor;
+
+                    lblTmrwTimeFrmt.ForeColor = _objAppearance.ForeColor;
+                    lblTmrwTimeFrmt.BackColor = _objAppearance.BackColor;
+
+                    this.BackColor = _objAppearance.BackColor;
+                    this.ForeColor = _objAppearance.ForeColor;
+
+                    this.panel1.ResumeLayout(false);
+                    this.panelBottom.ResumeLayout(false);
+                    this.tblpnlCntnr.ResumeLayout(false);
+                    this.tblpnlCntnr.PerformLayout();
+                    this.ResumeLayout(false);
+                }
+
+               
+            }
+            catch (Exception ex)
+            {
+                Beesys.Wasp.Workflow.LogWriter.WriteLog(ex);
+            }
+            finally
+            {
+                this.panel1.ResumeLayout(false);
+                this.panelBottom.ResumeLayout(false);
+                this.tblpnlCntnr.ResumeLayout(false);
+                this.tblpnlCntnr.PerformLayout();
+                this.ResumeLayout(false);
+            }
+        }
 
         /// <summary>
         /// Get Updated Time.
