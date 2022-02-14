@@ -24,8 +24,8 @@ namespace Beesys.Wasp.AddIn
         internal const string lblTime = "70052";
         internal const string lblTodaysTime = "70053";
         internal const string lblTomorrowTime = "70054";
-        internal static readonly string VARTODAYDATE = "Today"; // S.No.: -			05
-        internal static readonly string VARTOMORROWDATE = "Tomorrow"; // S.No.: -			05
+        internal static readonly string VARTODAYDATE = "Today"; 
+        internal static readonly string VARTOMORROWDATE = "Tomorrow"; 
         internal static readonly string TIMEFORMATE = "Time Format:";
         internal static readonly string TODAYTIMEFORMATE = "Today's Date Format:";
         internal static readonly string TOMORROWTIMEFORMATE = "Tomorrow's Date Format:";

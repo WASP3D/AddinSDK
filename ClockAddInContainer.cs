@@ -18,14 +18,12 @@ namespace Beesys.Wasp.AddIn
         private                           Scene                                         m_ObjSceneGraph;
         private                           IWService                                     m_WService          = null;
         private                           IWHost                                        m_WHost             = null;
-       
         private                           const string                                  XMLSTRING = "<data><addins></addins></data>";
 
         #endregion
 
         #region Constructor
 
-        //  S.No.: -			03
         public ClockAddInContainer()
         {
             if (m_lstAddins == null)
@@ -36,6 +34,9 @@ namespace Beesys.Wasp.AddIn
 
         #region Properties
 
+        /// <summary>
+        /// override scenegraph instance to update All addins SceneGraph property
+        /// </summary>
         public override Scene SceneGraph
         {
             get
@@ -45,9 +46,16 @@ namespace Beesys.Wasp.AddIn
             set
             {
                 m_ObjSceneGraph = value;
+                UpdateAddinSceneGraph(); 
             }
         }
 
+
+        /// <summary>
+        /// Override Host service to get IWServiceInstance
+        /// Pass this instance to all addins to get designer services 
+        /// like list of variables/nodes/dataset 
+        /// </summary>
         public override IWHost Host
         {
             get
@@ -76,6 +84,8 @@ namespace Beesys.Wasp.AddIn
             {
                 if (m_lstAddins != null && m_lstAddins.Contains(addin))
                 {
+                    if (addin is ClockAddIn)
+                        ((ClockAddIn)addin).OnBeforeShutDown();
                     addin.ShutDown();
                     m_lstAddins.Remove(addin);
                     addin = null;
@@ -128,10 +138,8 @@ namespace Beesys.Wasp.AddIn
 
         /// <summary>
         /// On Scenegraph opened load is called 
-        /// Read xml and craete addin objects
+        /// Read xml and create addin objects
         /// </summary>
-        /// <param name="sgKey"></param>
-        /// <param name="data"></param>
         public override void Load(string sgKey, string data)
         {
             IEnumerable<XElement> xeAddins = null;
@@ -197,8 +205,6 @@ namespace Beesys.Wasp.AddIn
         /// <summary>
         /// on Scene Closed save addin info in xml and return in string format
         /// </summary>
-        /// <param name="globalData"></param>
-        /// <returns></returns>
         public override string Save(List<GlobalData> globalData)
         {
             XDocument xdocAddinDetail   = null;
@@ -240,16 +246,16 @@ namespace Beesys.Wasp.AddIn
             {
                 if (m_lstAddins != null)
                 {
-
-                    foreach(IWAddIn addin in m_lstAddins) //S.No.: -			07
+                    foreach(IWAddIn addin in m_lstAddins) 
                     {
                         if (addin != null)
+                        {
+                            if (addin is ClockAddIn)
+                                ((ClockAddIn)addin).OnBeforeShutDown();
                             addin.ShutDown();
                     }
-                    // S.No.: -			02
+                    }
                     m_lstAddins.Clear();
-
-                    
                     m_lstAddins = null;
                 }
                 m_ObjSceneGraph = null;
@@ -270,7 +276,6 @@ namespace Beesys.Wasp.AddIn
         /// create node for every addin
         /// store data of addin in xml
         /// </summary>
-        /// <param name="xeAddins"></param>
         private void GetAddinXml(XElement xeAddins)
         {
             XElement xeAddin = null;
@@ -320,6 +325,25 @@ namespace Beesys.Wasp.AddIn
             finally
             {
 
+            }
+        }
+
+        private void UpdateAddinSceneGraph() 
+        {
+            try
+            {
+                if (m_lstAddins != null && m_lstAddins.Count > 0)
+                {
+                    foreach (IWAddIn objAddin in m_lstAddins)
+                    {
+                        
+                        (objAddin as ClockAddIn).SceneGraph = m_ObjSceneGraph;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                LogWriter.WriteLog(ex);
             }
         }
 

@@ -10,27 +10,26 @@ using Beesys.Wasp.Workflow;
 
 namespace Beesys.Wasp.AddIn
 {
-    public class ClockAddInProvider : WEngineProvider
+    public class ClockAddInProvider : WProvider
     {
 
         #region Class Members
 
         private List<AddinInfo> m_lstAddinInfo = null;
         private List<IWContainer> m_lstContainer = null;
-        private static string m_sAssemblyPath = string.Empty;// S.No.: -06
+        private static string m_sAssemblyPath = string.Empty;
         private string addinName = "Clock";
         #endregion
 
         #region constructor
 
-        static ClockAddInProvider()//S.No.: -06
+        static ClockAddInProvider()
         {
             string sLocation = string.Empty;
             string sDirectoryName = string.Empty;
             try
             {
                 sLocation = Assembly.GetExecutingAssembly().Location;
-
                 if (!string.IsNullOrEmpty(sLocation))
                 {
                    sDirectoryName = Path.GetDirectoryName(sLocation);
@@ -38,7 +37,7 @@ namespace Beesys.Wasp.AddIn
                         m_sAssemblyPath = sDirectoryName;
                 }
             }
-            catch (Exception)
+            catch(Exception ex)
             {
 
             }
@@ -49,11 +48,11 @@ namespace Beesys.Wasp.AddIn
             }
         }
 
-        public ClockAddInProvider()//S.No.: -06
+        public ClockAddInProvider()
         {
             try
             {
-                base.AssemblyPath = m_sAssemblyPath;
+                AssemblyPath = m_sAssemblyPath;
             }
             catch (Exception ex)
             {
@@ -63,9 +62,29 @@ namespace Beesys.Wasp.AddIn
 
         #endregion
 
-
         #region Properties
 
+        public string DefaultCulture
+        {
+            get;
+            set;
+
+        }
+
+        public string AssemblyPath
+        {
+            get;
+            set;
+        }
+        public Beesys.Wasp.Workflow.WaspCulture CultureReader
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Override to return type of addin contains by provider 
+        /// </summary>
         public override AddinInfo[] AddinsType
         {
             get
@@ -74,6 +93,10 @@ namespace Beesys.Wasp.AddIn
             }
         }
 
+        /// <summary>
+        /// Override the type of addin to be created .
+        /// Set as DataTable, as single table created having time information.
+        /// </summary>
         public override WProviderType Type
         {
             get
@@ -82,6 +105,10 @@ namespace Beesys.Wasp.AddIn
             }
         }
 
+        /// <summary>
+        /// override Singleton to determine whether single addin to be created or not.
+        /// return false as multiple addin in local scene can be created.
+        /// </summary>
         public override bool Singleton
         {
             get
@@ -95,7 +122,8 @@ namespace Beesys.Wasp.AddIn
         #region Overrided Methods
 
         /// <summary>
-        /// Delete container
+        /// Override Delete container to call containers shut down and remove container
+        /// from list
         /// </summary>
         /// <param name="container"></param>
         public override void DeleteContainer(IWContainer container)
@@ -115,7 +143,7 @@ namespace Beesys.Wasp.AddIn
         }
 
         /// <summary>
-        /// Return Conatiner Object
+        /// Return Conatiner Object, for new scene
         /// </summary>
         /// <returns></returns>
         public override IWContainer GetContainer()
@@ -140,7 +168,7 @@ namespace Beesys.Wasp.AddIn
         }
 
         /// <summary>
-        /// On Addin Shutdown
+        /// On Addin Shutdown, release the resources by calling containers shut down
         /// </summary>
         public override void ShutDown()
         {
@@ -156,8 +184,6 @@ namespace Beesys.Wasp.AddIn
                     m_lstContainer = null;
                 }
                 Engine = null;
-                
-               
             }
             catch (Exception ex)
             {
@@ -167,6 +193,8 @@ namespace Beesys.Wasp.AddIn
 
         /// <summary>
         /// On Addin start up
+        /// Set the culture file for addin
+        /// Set the addin type info
         /// </summary>
         public override void StartUp()
         {
@@ -184,13 +212,6 @@ namespace Beesys.Wasp.AddIn
                 m_lstContainer = new List<IWContainer>();
                 m_lstAddinInfo = new List<AddinInfo>();
                 m_lstAddinInfo.Add(new AddinInfo() { AddinType = "Clock", Button = true, ButtonCaption = addinName });
-
-               
-               //S.No.: -06
-
-                //read culture file
-
-
             } //End(try)
             catch (Exception ex)
             {
@@ -199,10 +220,28 @@ namespace Beesys.Wasp.AddIn
         }//End(StartUp())
 
         #endregion
+
+
+        public virtual void InitCultureReader()
+        {
+            try
+            {
+                if (CultureReader == null)
+                {
+                    if (!string.IsNullOrEmpty(this.CurrentCulture))
+                        DefaultCulture = this.CurrentCulture;
+                    if (!string.IsNullOrEmpty(AssemblyPath))
+                    {
+                        CultureReader = new Beesys.Wasp.Workflow.WaspCulture();
+                        CultureReader.Initialize(AssemblyPath, DefaultCulture);
+                    }
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
     }
-
-
-
-
-  
 }
