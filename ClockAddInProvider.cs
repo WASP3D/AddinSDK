@@ -39,7 +39,7 @@ namespace Beesys.Wasp.AddIn
             }
             catch(Exception ex)
             {
-
+                    Beesys.Wasp.Workflow.LogWriter.WriteLog(ex);
             }
             finally
             {

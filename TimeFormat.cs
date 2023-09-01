@@ -184,7 +184,7 @@ namespace Beesys.Wasp.AddIn
 
             catch (Exception ex)
             {
-
+                Beesys.Wasp.Workflow.LogWriter.WriteLog(ex);
             }
         }
         protected override bool ProcessDialogKey(Keys keyData)
