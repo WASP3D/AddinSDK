@@ -263,8 +263,9 @@ namespace Beesys.Wasp.AddIn
 
                 InitWireData();
                 m_ObjEngine = Engine;
-
-                if (m_ObjEngine.DesignerMode == 0) 
+                //Defect :Clock Addin is not playing in Designer on newSDK Dlls
+                //https://waspsource.beesys.com/Products/Common/-/issues/3391
+                //if (m_ObjEngine.DesignerMode == 0) 
                     m_ObjEngine.m_evtEWEnginRenderInfo += new dlgtOnEngineRenderInfo(m_ObjEngine_m_evtEWEnginPreRenderInfo);
 
                 CreateVariable(ClockAddinConstants.VARTODAYDATE, "", VAR_TYPE.VAR_DATE_TIME, VariableOptionsBehaviour.AllowVisible | VariableOptionsBehaviour.AllowWiring, ControlType.Clock);

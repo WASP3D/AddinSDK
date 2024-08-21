@@ -48,24 +48,21 @@
     </Reference>
     <Reference Include="BeeSys.Wasp3D.Hosting.WControls">
       <HintPath>Dependencies\BeeSys.Wasp3D.Hosting.WControls.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BeeSys.Wasp3D.Hosting.WInterface">
       <HintPath>Dependencies\BeeSys.Wasp3D.Hosting.WInterface.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.v23.2, Version=23.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Dependencies\DevExpress.Data.v20.1.dll</HintPath>
+      <HintPath>Dependencies\DevExpress.Data.v23.2.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Utils.v23.2, Version=23.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraEditors.v23.2, Version=23.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Dependencies\DevExpress.Utils.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraEditors.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Dependencies\DevExpress.XtraEditors.v20.1.dll</HintPath>
+      <HintPath>Dependencies\DevExpress.XtraEditors.v23.2.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="GeneralTasks">
