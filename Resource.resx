@@ -119,6 +119,7 @@
   </resheader>
   <data name="cancel" xml:space="preserve">
     <value>Cancel</value>
+    <comment>  </comment>
   </data>
   <data name="CaptionTimeFormat" xml:space="preserve">
     <value>Time Format</value>
@@ -137,6 +138,7 @@
   </data>
   <data name="second" xml:space="preserve">
     <value>Second</value>
+    <comment> </comment>
   </data>
   <data name="time" xml:space="preserve">
     <value>Time</value>

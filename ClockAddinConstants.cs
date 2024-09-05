@@ -7,7 +7,7 @@ namespace Beesys.Wasp.AddIn
 {
     internal class ClockAddinConstants
     {
-        internal static readonly string MODULENAME = "Clock";
+        internal static readonly string MODULENAME = "Clock"; 
         internal static readonly string TIME = "TIME";
         internal static readonly string HOUR = "HOUR";
         internal static readonly string MINUTE = "MINUTE";

@@ -12,7 +12,7 @@ using System.IO;
 using System.Diagnostics;
 using Beesys.Wasp.Workflow;
 
-namespace Beesys.Wasp.AddIn
+namespace Beesys.Wasp.AddIn 
 {
     public partial class ClockAddIn : WDataTable,IWAddInEx
     {

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using LogWriter = Beesys.Wasp.Workflow.LogWriter;
 
-namespace Beesys.Wasp.AddIn
+namespace Beesys.Wasp.AddIn 
 {
     public partial class frmConfig : WXtraForm
     {

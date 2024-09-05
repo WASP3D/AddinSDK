@@ -10,7 +10,7 @@ using Beesys.Wasp.Workflow;
 
 namespace Beesys.Wasp.AddIn
 {
-    public class ClockAddInProvider : WProvider
+    public class ClockAddInProvider : WProvider 
     {
 
         #region Class Members

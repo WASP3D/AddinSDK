@@ -2,7 +2,7 @@
 
 namespace Beesys.Wasp.AddIn
 {
-    partial class frmConfig
+    partial class frmConfig 
     {
         /// <summary>
         /// Required designer variable.

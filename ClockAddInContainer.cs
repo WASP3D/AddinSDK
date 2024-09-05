@@ -9,7 +9,7 @@ using System.Xml.XPath;
 
 namespace Beesys.Wasp.AddIn
 {
-    public class ClockAddInContainer:WContainer
+    public class ClockAddInContainer:WContainer 
     {
 
         #region Class Members
